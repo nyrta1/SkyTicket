@@ -1,0 +1,12 @@
+syntax = "proto3";
+
+option java_package = "com.nyrta1.SkyTicket_AdminService.models";
+option java_outer_classname = "AirplaneEntity";
+
+message Airplane {
+  int64 id = 1;
+  string model = 2;
+  string manufacturer = 3;
+  int32 capacity = 4;
+  string registrationNumber = 5;
+}
