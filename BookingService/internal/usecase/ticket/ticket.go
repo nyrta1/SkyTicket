@@ -10,10 +10,10 @@ type UseCase interface {
 }
 
 type TicketUseCase struct {
-	data entity.TicketData
+	data *entity.MemoryTicketData // Change the type to a pointer
 }
 
-func NewTicketUseCase(data entity.TicketData) *TicketUseCase {
+func NewTicketUseCase(data *entity.MemoryTicketData) *TicketUseCase { // Change the parameter type
 	return &TicketUseCase{data: data}
 }
 
