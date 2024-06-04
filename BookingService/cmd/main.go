@@ -8,10 +8,13 @@ import (
 	"database/sql"
 	"fmt"
 	"github.com/gin-gonic/gin"
+	"github.com/joho/godotenv"
 	_ "github.com/lib/pq"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
+	"log"
 	"net"
+	"os"
 )
 
 func main() {
@@ -50,11 +53,21 @@ func main() {
 	}
 }
 func ConnectDB() (*sql.DB, error) {
-	connectionString := "postgres://postgres.qsomfcuspekuribwikhw:Vzi5zzDAq1A2Kesf@aws-0-eu-central-1.pooler.supabase.com:5432/postgres?sslmode=disable"
+	err := godotenv.Load()
+	if err != nil {
+		log.Printf("Error loading .env file: %v", err)
+	}
+
+	connectionString := os.Getenv("DB_CONNECTION_STRING")
+	if connectionString == "" {
+		return nil, fmt.Errorf("DB_CONNECTION_STRING environment variable not set")
+	}
+
 	db, err := sql.Open("postgres", connectionString)
 	if err != nil {
 		return nil, fmt.Errorf("failed to open the database: %w", err)
 	}
+
 	err = db.Ping()
 	if err != nil {
 		db.Close()
