@@ -1,13 +1,11 @@
-# Ignore IntelliJ IDEA / JetBrains project-specific files
+
 /.idea/
 /shelf/
 /workspace.xml
 /dataSources/
 /dataSources.local.xml
 
-# Ignore Editor-based HTTP Client requests
 /httpRequests/
-
-# Ignore environment variable files
+s
 /.env
 googleapis/
