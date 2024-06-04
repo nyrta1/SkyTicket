@@ -1,0 +1,12 @@
+syntax = "proto3";
+
+option java_package = "com.nyrta1.SkyTicket_AdminService.models";
+option java_outer_classname = "ManufacturerEntity";
+
+import "google/protobuf/timestamp.proto";
+
+message Manufacturer {
+  int64 id = 1;
+  string name = 2;
+  google.protobuf.Timestamp created_at = 3;
+}

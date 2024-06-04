@@ -3,10 +3,15 @@ syntax = "proto3";
 option java_package = "com.nyrta1.SkyTicket_AdminService.models";
 option java_outer_classname = "AirplaneEntity";
 
+import "google/protobuf/timestamp.proto";
+
 message Airplane {
   int64 id = 1;
-  string model = 2;
-  string manufacturer = 3;
-  int32 capacity = 4;
-  string registrationNumber = 5;
+  int32 manufacturer_id = 2;
+  int32 manufacturer_year = 3;
+  int32 first_slot_capacity = 4;
+  int32 economy_slot_capacity = 5;
+  int32 country_origin_id = 6;
+  google.protobuf.Timestamp created_at = 7;
+  google.protobuf.Timestamp updated_at = 8;
 }
