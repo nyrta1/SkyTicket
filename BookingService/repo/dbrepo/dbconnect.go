@@ -1,10 +1,9 @@
-package data
+package dbrepo
 
 import (
 	"database/sql"
 )
 
-// DBConnection handles the database connection
 type DBConnection struct {
 	DB *sql.DB
 }
