@@ -105,21 +105,43 @@ func (r *BookingModel) UpdateBookingStatus(ctx context.Context, id int64, status
 }
 
 func (r *BookingModel) ListBooking(ctx context.Context) ([]*Booking, error) {
-	query := `SELECT id, code, customer_id, flight_id, status, created_at, updated_at FROM bookings`
-	rows, err := r.Db.QueryContext(ctx, query)
-	if err != nil {
-		return nil, err
+	//query := `SELECT id, code, customer_id, flight_id, status, created_at, updated_at FROM bookings`
+	//rows, err := r.Db.QueryContext(ctx, query)
+	//if err != nil {
+	//	return nil, err
+	//}
+	//defer rows.Close()
+	//
+	//var bookings []*Booking
+	//for rows.Next() {
+	//	var booking Booking
+	//	err := rows.Scan(&booking.ID, &booking.Code, &booking.CustomerID, &booking.FlightID, &booking.Status, &booking.CreatedAt, &booking.UpdatedAt)
+	//	if err != nil {
+	//		return nil, err
+	//	}
+	//	bookings = append(bookings, &booking)
+	//}
+	//return bookings, nil
+	dummyData := []*Booking{
+		{
+			ID:         1,
+			Code:       "ABC123",
+			CustomerID: 101,
+			FlightID:   201,
+			Status:     "confirmed",
+			CreatedAt:  time.Now().Add(-24 * time.Hour),
+			UpdatedAt:  time.Now(),
+		},
+		{
+			ID:         2,
+			Code:       "DEF456",
+			CustomerID: 102,
+			FlightID:   202,
+			Status:     "pending",
+			CreatedAt:  time.Now().Add(-48 * time.Hour),
+			UpdatedAt:  time.Now(),
+		},
 	}
-	defer rows.Close()
 
-	var bookings []*Booking
-	for rows.Next() {
-		var booking Booking
-		err := rows.Scan(&booking.ID, &booking.Code, &booking.CustomerID, &booking.FlightID, &booking.Status, &booking.CreatedAt, &booking.UpdatedAt)
-		if err != nil {
-			return nil, err
-		}
-		bookings = append(bookings, &booking)
-	}
-	return bookings, nil
+	return dummyData, nil
 }

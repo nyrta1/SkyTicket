@@ -11,7 +11,6 @@ import (
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"
 	status "google.golang.org/grpc/status"
-	emptypb "google.golang.org/protobuf/types/known/emptypb"
 )
 
 // This is a compile-time assertion to ensure that this generated file
@@ -26,14 +25,6 @@ const (
 	BookingManager_GetBooking_FullMethodName          = "/BookingManager/GetBooking"
 	BookingManager_UpdateBookingStatus_FullMethodName = "/BookingManager/UpdateBookingStatus"
 	BookingManager_ListBooking_FullMethodName         = "/BookingManager/ListBooking"
-	BookingManager_CreateFlight_FullMethodName        = "/BookingManager/CreateFlight"
-	BookingManager_UpdateFlight_FullMethodName        = "/BookingManager/UpdateFlight"
-	BookingManager_DeleteFlight_FullMethodName        = "/BookingManager/DeleteFlight"
-	BookingManager_UpdateFlightSlot_FullMethodName    = "/BookingManager/UpdateFlightSlot"
-	BookingManager_GetFlight_FullMethodName           = "/BookingManager/GetFlight"
-	BookingManager_GetFlightById_FullMethodName       = "/BookingManager/GetFlightById"
-	BookingManager_SearchFlight_FullMethodName        = "/BookingManager/SearchFlight"
-	BookingManager_ListFlight_FullMethodName          = "/BookingManager/ListFlight"
 )
 
 // BookingManagerClient is the client API for BookingManager service.
@@ -46,14 +37,6 @@ type BookingManagerClient interface {
 	GetBooking(ctx context.Context, in *GetBookingRequest, opts ...grpc.CallOption) (*Booking, error)
 	UpdateBookingStatus(ctx context.Context, in *UpdateBookingStatusRequest, opts ...grpc.CallOption) (*UpdateBookingStatusResponse, error)
 	ListBooking(ctx context.Context, in *ListBookingRequest, opts ...grpc.CallOption) (*ListBookingResponse, error)
-	CreateFlight(ctx context.Context, in *Flight, opts ...grpc.CallOption) (*Flight, error)
-	UpdateFlight(ctx context.Context, in *Flight, opts ...grpc.CallOption) (*Flight, error)
-	DeleteFlight(ctx context.Context, in *DeleteFlightRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
-	UpdateFlightSlot(ctx context.Context, in *UpdateFlightSlotRequest, opts ...grpc.CallOption) (*Flight, error)
-	GetFlight(ctx context.Context, in *GetFlightRequest, opts ...grpc.CallOption) (*Flight, error)
-	GetFlightById(ctx context.Context, in *GetFlightRequest, opts ...grpc.CallOption) (*Flight, error)
-	SearchFlight(ctx context.Context, in *SearchFlightRequest, opts ...grpc.CallOption) (*SearchFlightResponse, error)
-	ListFlight(ctx context.Context, in *ListFlightRequest, opts ...grpc.CallOption) (*ListFlightResponse, error)
 }
 
 type bookingManagerClient struct {
@@ -124,86 +107,6 @@ func (c *bookingManagerClient) ListBooking(ctx context.Context, in *ListBookingR
 	return out, nil
 }
 
-func (c *bookingManagerClient) CreateFlight(ctx context.Context, in *Flight, opts ...grpc.CallOption) (*Flight, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(Flight)
-	err := c.cc.Invoke(ctx, BookingManager_CreateFlight_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *bookingManagerClient) UpdateFlight(ctx context.Context, in *Flight, opts ...grpc.CallOption) (*Flight, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(Flight)
-	err := c.cc.Invoke(ctx, BookingManager_UpdateFlight_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *bookingManagerClient) DeleteFlight(ctx context.Context, in *DeleteFlightRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(emptypb.Empty)
-	err := c.cc.Invoke(ctx, BookingManager_DeleteFlight_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *bookingManagerClient) UpdateFlightSlot(ctx context.Context, in *UpdateFlightSlotRequest, opts ...grpc.CallOption) (*Flight, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(Flight)
-	err := c.cc.Invoke(ctx, BookingManager_UpdateFlightSlot_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *bookingManagerClient) GetFlight(ctx context.Context, in *GetFlightRequest, opts ...grpc.CallOption) (*Flight, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(Flight)
-	err := c.cc.Invoke(ctx, BookingManager_GetFlight_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *bookingManagerClient) GetFlightById(ctx context.Context, in *GetFlightRequest, opts ...grpc.CallOption) (*Flight, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(Flight)
-	err := c.cc.Invoke(ctx, BookingManager_GetFlightById_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *bookingManagerClient) SearchFlight(ctx context.Context, in *SearchFlightRequest, opts ...grpc.CallOption) (*SearchFlightResponse, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(SearchFlightResponse)
-	err := c.cc.Invoke(ctx, BookingManager_SearchFlight_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *bookingManagerClient) ListFlight(ctx context.Context, in *ListFlightRequest, opts ...grpc.CallOption) (*ListFlightResponse, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(ListFlightResponse)
-	err := c.cc.Invoke(ctx, BookingManager_ListFlight_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
 // BookingManagerServer is the server API for BookingManager service.
 // All implementations must embed UnimplementedBookingManagerServer
 // for forward compatibility
@@ -214,14 +117,6 @@ type BookingManagerServer interface {
 	GetBooking(context.Context, *GetBookingRequest) (*Booking, error)
 	UpdateBookingStatus(context.Context, *UpdateBookingStatusRequest) (*UpdateBookingStatusResponse, error)
 	ListBooking(context.Context, *ListBookingRequest) (*ListBookingResponse, error)
-	CreateFlight(context.Context, *Flight) (*Flight, error)
-	UpdateFlight(context.Context, *Flight) (*Flight, error)
-	DeleteFlight(context.Context, *DeleteFlightRequest) (*emptypb.Empty, error)
-	UpdateFlightSlot(context.Context, *UpdateFlightSlotRequest) (*Flight, error)
-	GetFlight(context.Context, *GetFlightRequest) (*Flight, error)
-	GetFlightById(context.Context, *GetFlightRequest) (*Flight, error)
-	SearchFlight(context.Context, *SearchFlightRequest) (*SearchFlightResponse, error)
-	ListFlight(context.Context, *ListFlightRequest) (*ListFlightResponse, error)
 	mustEmbedUnimplementedBookingManagerServer()
 }
 
@@ -246,30 +141,6 @@ func (UnimplementedBookingManagerServer) UpdateBookingStatus(context.Context, *U
 }
 func (UnimplementedBookingManagerServer) ListBooking(context.Context, *ListBookingRequest) (*ListBookingResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ListBooking not implemented")
-}
-func (UnimplementedBookingManagerServer) CreateFlight(context.Context, *Flight) (*Flight, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method CreateFlight not implemented")
-}
-func (UnimplementedBookingManagerServer) UpdateFlight(context.Context, *Flight) (*Flight, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method UpdateFlight not implemented")
-}
-func (UnimplementedBookingManagerServer) DeleteFlight(context.Context, *DeleteFlightRequest) (*emptypb.Empty, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method DeleteFlight not implemented")
-}
-func (UnimplementedBookingManagerServer) UpdateFlightSlot(context.Context, *UpdateFlightSlotRequest) (*Flight, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method UpdateFlightSlot not implemented")
-}
-func (UnimplementedBookingManagerServer) GetFlight(context.Context, *GetFlightRequest) (*Flight, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetFlight not implemented")
-}
-func (UnimplementedBookingManagerServer) GetFlightById(context.Context, *GetFlightRequest) (*Flight, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetFlightById not implemented")
-}
-func (UnimplementedBookingManagerServer) SearchFlight(context.Context, *SearchFlightRequest) (*SearchFlightResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method SearchFlight not implemented")
-}
-func (UnimplementedBookingManagerServer) ListFlight(context.Context, *ListFlightRequest) (*ListFlightResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method ListFlight not implemented")
 }
 func (UnimplementedBookingManagerServer) mustEmbedUnimplementedBookingManagerServer() {}
 
@@ -392,150 +263,6 @@ func _BookingManager_ListBooking_Handler(srv interface{}, ctx context.Context, d
 	return interceptor(ctx, in, info, handler)
 }
 
-func _BookingManager_CreateFlight_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(Flight)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(BookingManagerServer).CreateFlight(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: BookingManager_CreateFlight_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(BookingManagerServer).CreateFlight(ctx, req.(*Flight))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _BookingManager_UpdateFlight_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(Flight)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(BookingManagerServer).UpdateFlight(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: BookingManager_UpdateFlight_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(BookingManagerServer).UpdateFlight(ctx, req.(*Flight))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _BookingManager_DeleteFlight_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(DeleteFlightRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(BookingManagerServer).DeleteFlight(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: BookingManager_DeleteFlight_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(BookingManagerServer).DeleteFlight(ctx, req.(*DeleteFlightRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _BookingManager_UpdateFlightSlot_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(UpdateFlightSlotRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(BookingManagerServer).UpdateFlightSlot(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: BookingManager_UpdateFlightSlot_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(BookingManagerServer).UpdateFlightSlot(ctx, req.(*UpdateFlightSlotRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _BookingManager_GetFlight_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(GetFlightRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(BookingManagerServer).GetFlight(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: BookingManager_GetFlight_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(BookingManagerServer).GetFlight(ctx, req.(*GetFlightRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _BookingManager_GetFlightById_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(GetFlightRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(BookingManagerServer).GetFlightById(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: BookingManager_GetFlightById_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(BookingManagerServer).GetFlightById(ctx, req.(*GetFlightRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _BookingManager_SearchFlight_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(SearchFlightRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(BookingManagerServer).SearchFlight(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: BookingManager_SearchFlight_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(BookingManagerServer).SearchFlight(ctx, req.(*SearchFlightRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _BookingManager_ListFlight_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(ListFlightRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(BookingManagerServer).ListFlight(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: BookingManager_ListFlight_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(BookingManagerServer).ListFlight(ctx, req.(*ListFlightRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
 // BookingManager_ServiceDesc is the grpc.ServiceDesc for BookingManager service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -566,38 +293,6 @@ var BookingManager_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "ListBooking",
 			Handler:    _BookingManager_ListBooking_Handler,
-		},
-		{
-			MethodName: "CreateFlight",
-			Handler:    _BookingManager_CreateFlight_Handler,
-		},
-		{
-			MethodName: "UpdateFlight",
-			Handler:    _BookingManager_UpdateFlight_Handler,
-		},
-		{
-			MethodName: "DeleteFlight",
-			Handler:    _BookingManager_DeleteFlight_Handler,
-		},
-		{
-			MethodName: "UpdateFlightSlot",
-			Handler:    _BookingManager_UpdateFlightSlot_Handler,
-		},
-		{
-			MethodName: "GetFlight",
-			Handler:    _BookingManager_GetFlight_Handler,
-		},
-		{
-			MethodName: "GetFlightById",
-			Handler:    _BookingManager_GetFlightById_Handler,
-		},
-		{
-			MethodName: "SearchFlight",
-			Handler:    _BookingManager_SearchFlight_Handler,
-		},
-		{
-			MethodName: "ListFlight",
-			Handler:    _BookingManager_ListFlight_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

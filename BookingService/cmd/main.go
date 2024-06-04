@@ -1,32 +1,72 @@
 package main
 
 import (
+	"context"
+	"log"
+	"net"
+	"net/http"
+	"sync"
+
+	_ "github.com/gin-gonic/gin"
+	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/reflection"
+	_ "google.golang.org/protobuf/types/known/timestamppb"
+
 	"SkyTicket/handlers"
-	"SkyTicket/pb"
+	pb "SkyTicket/pb"
 	"SkyTicket/pkg/logger"
 	repository "SkyTicket/repo"
 	"database/sql"
 	"fmt"
-	"github.com/gin-gonic/gin"
+	"os"
+
 	"github.com/joho/godotenv"
 	_ "github.com/lib/pq"
-	"google.golang.org/grpc"
-	"google.golang.org/grpc/reflection"
-	"log"
-	"net"
-	"os"
+)
+
+const (
+	grpcAddress = "localhost:50051"
+	httpAddress = "localhost:8080"
 )
 
 func main() {
+	ctx := context.Background()
+
+	wg := &sync.WaitGroup{}
+	wg.Add(2)
+
+	go func() {
+		defer wg.Done()
+
+		if err := startGrpcServer(); err != nil {
+			log.Fatal(err)
+		}
+	}()
+
+	go func() {
+		defer wg.Done()
+
+		if err := startHttpServer(ctx); err != nil {
+			log.Fatal(err)
+		}
+	}()
+
+	wg.Wait()
+}
+
+func startGrpcServer() error {
 	log := logger.NewLogger()
+
 	dbConn, err := ConnectDB()
 	if err != nil {
 		log.Fatal(err)
 	}
 	defer dbConn.Close()
+
 	models := repository.NewModels(dbConn)
 
-	bookingHandler, err := handlers.NewBookingHandler(&models.Booking, &models.Flight)
+	bookingHandler, err := handlers.NewBookingHandler(&models.Booking)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -35,27 +75,41 @@ func main() {
 	pb.RegisterBookingManagerServer(grpcServer, bookingHandler)
 	reflection.Register(grpcServer)
 
-	go func() {
-		lis, err := net.Listen("tcp", ":50051")
-		if err != nil {
-			log.Fatalf("Failed to listen: %v", err)
-		}
-		log.Infof("gRPC server listening at %v", lis.Addr())
-		if err := grpcServer.Serve(lis); err != nil {
-			log.Fatalf("Failed to serve gRPC server: %v", err)
-		}
-	}()
-
-	r := gin.Default()
-	log.Infof("HTTP server listening at :8080")
-	if err := r.Run(":8080"); err != nil {
-		log.Fatalf("Failed to run HTTP server: %v", err)
+	list, err := net.Listen("tcp", grpcAddress)
+	if err != nil {
+		return err
 	}
+
+	log.Printf("gRPC server listening at %v\n", grpcAddress)
+
+	return grpcServer.Serve(list)
 }
+
+func startHttpServer(ctx context.Context) error {
+	log := logger.NewLogger()
+
+	mux := runtime.NewServeMux()
+
+	opts := []grpc.DialOption{
+		grpc.WithInsecure(),
+	}
+
+	err := pb.RegisterBookingManagerHandlerFromEndpoint(ctx, mux, grpcAddress, opts)
+	if err != nil {
+		return err
+	}
+
+	log.Printf("HTTP server listening at %v\n", httpAddress)
+
+	return http.ListenAndServe(httpAddress, mux)
+}
+
 func ConnectDB() (*sql.DB, error) {
+	newLogger := logger.NewLogger()
+
 	err := godotenv.Load()
 	if err != nil {
-		log.Printf("Error loading .env file: %v", err)
+		newLogger.Printf("Error loading .env file: %v", err)
 	}
 
 	connectionString := os.Getenv("DB_CONNECTION_STRING")
