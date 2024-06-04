@@ -10,38 +10,4 @@
 
 # Ignore environment variable files
 /.env
-
-# Ignore node_modules (if you're using Node.js)
-/node_modules/
-
-# Ignore OS-specific files
-.DS_Store
-Thumbs.db
-
-# Ignore compiled files (example for Go)
-/bin/
-/build/
-*.exe
-*.dll
-*.so
-*.dylib
-*.test
-
-# Ignore dependency directories (example for Go)
-vendor/
-
-# Ignore log files and temporary files
-*.log
-*.tmp
-
-# Ignore backup files
-*.bak
-*.swp
-
-# Ignore coverage files (example for testing coverage)
-coverage/
-*.cov
-
-# Ignore IDE project files
-.vscode/
-.idea/
+googleapis/
