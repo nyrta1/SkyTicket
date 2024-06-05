@@ -1,9 +1,8 @@
 package controller
 
 import (
-	"AirplaneService/internal/entity"
-	"AirplaneService/internal/grpc"
-	"AirplaneService/internal/repository"
+	"SkyTicket/AirplaneService/internal/repository"
+	"SkyTicket/proto/pb"
 	"context"
 	"database/sql"
 	"errors"
@@ -13,7 +12,7 @@ import (
 )
 
 type AirplaneHandler struct {
-	grpc.UnimplementedAirplaneServiceServer
+	pb.UnimplementedAirplaneServiceServer
 	airplaneRepo repository.AirplaneRepository
 }
 
@@ -23,7 +22,7 @@ func NewBookingHandler(bookingRepo repository.AirplaneRepository) (*AirplaneHand
 	}, nil
 }
 
-func (h *AirplaneHandler) GetAirplane(ctx context.Context, airplaneInput *entity.GetAirplaneRequest) (*entity.Airplane, error) {
+func (h *AirplaneHandler) GetAirplane(ctx context.Context, airplaneInput *pb.GetAirplaneRequest) (*pb.Airplane, error) {
 	airplane, err := h.airplaneRepo.GetById(ctx, airplaneInput.Id)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
@@ -35,7 +34,7 @@ func (h *AirplaneHandler) GetAirplane(ctx context.Context, airplaneInput *entity
 	return airplane, nil
 }
 
-func (h *AirplaneHandler) ListAirplanes(ctx context.Context, eb *emptypb.Empty) (*entity.ListAirplanesResponse, error) {
+func (h *AirplaneHandler) ListAirplanes(ctx context.Context, eb *emptypb.Empty) (*pb.ListAirplanesResponse, error) {
 	airplanes, err := h.airplaneRepo.GetAll(ctx)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
@@ -44,14 +43,14 @@ func (h *AirplaneHandler) ListAirplanes(ctx context.Context, eb *emptypb.Empty) 
 		return nil, status.Error(codes.Internal, err.Error())
 	}
 
-	airplanesResponse := &entity.ListAirplanesResponse{
+	airplanesResponse := &pb.ListAirplanesResponse{
 		Airplanes: airplanes,
 	}
 
 	return airplanesResponse, nil
 }
 
-func (h *AirplaneHandler) CreateAirplane(ctx context.Context, request *entity.CreateAirplaneRequest) (*entity.Airplane, error) {
+func (h *AirplaneHandler) CreateAirplane(ctx context.Context, request *pb.CreateAirplaneRequest) (*pb.Airplane, error) {
 	if err := h.airplaneRepo.Add(ctx, request.Airplane); err != nil {
 		return nil, status.Error(codes.Internal, err.Error())
 	}
@@ -59,7 +58,7 @@ func (h *AirplaneHandler) CreateAirplane(ctx context.Context, request *entity.Cr
 	return request.Airplane, nil
 }
 
-func (h *AirplaneHandler) UpdateAirplane(ctx context.Context, request *entity.UpdateAirplaneRequest) (*entity.Airplane, error) {
+func (h *AirplaneHandler) UpdateAirplane(ctx context.Context, request *pb.UpdateAirplaneRequest) (*pb.Airplane, error) {
 	if err := h.airplaneRepo.UpdateById(ctx, request.Airplane.Id, request.Airplane); err != nil {
 		return nil, status.Error(codes.Internal, err.Error())
 	}
@@ -67,7 +66,7 @@ func (h *AirplaneHandler) UpdateAirplane(ctx context.Context, request *entity.Up
 	return request.Airplane, nil
 }
 
-func (h *AirplaneHandler) DeleteAirplane(ctx context.Context, request *entity.DeleteAirplaneRequest) (*emptypb.Empty, error) {
+func (h *AirplaneHandler) DeleteAirplane(ctx context.Context, request *pb.DeleteAirplaneRequest) (*emptypb.Empty, error) {
 	if err := h.airplaneRepo.DeleteById(ctx, request.Id); err != nil {
 		return nil, status.Error(codes.Internal, err.Error())
 	}

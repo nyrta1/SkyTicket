@@ -1,9 +1,8 @@
 package controller
 
 import (
-	"AirplaneService/internal/entity"
-	"AirplaneService/internal/grpc"
-	"AirplaneService/internal/repository"
+	"SkyTicket/AirplaneService/internal/repository"
+	"SkyTicket/proto/pb"
 	"context"
 	"database/sql"
 	"errors"
@@ -13,7 +12,7 @@ import (
 )
 
 type CountryHandler struct {
-	grpc.UnimplementedCountryServiceServer
+	pb.UnimplementedCountryServiceServer
 	countryRepo repository.CountryRepository
 }
 
@@ -23,8 +22,8 @@ func NewCountryHandler(countryRepo repository.CountryRepository) (*CountryHandle
 	}, nil
 }
 
-func (h *CountryHandler) CreateCountry(ctx context.Context, req *entity.CreateCountryRequest) (*entity.Country, error) {
-	country := &entity.Country{Name: req.Name, Prefix: req.Prefix}
+func (h *CountryHandler) CreateCountry(ctx context.Context, req *pb.CreateCountryRequest) (*pb.Country, error) {
+	country := &pb.Country{Name: req.Name, Prefix: req.Prefix}
 
 	if err := h.countryRepo.Add(ctx, country); err != nil {
 		return nil, status.Error(codes.Internal, err.Error())
@@ -33,7 +32,7 @@ func (h *CountryHandler) CreateCountry(ctx context.Context, req *entity.CreateCo
 	return country, nil
 }
 
-func (h *CountryHandler) GetCountry(ctx context.Context, req *entity.GetCountryRequest) (*entity.Country, error) {
+func (h *CountryHandler) GetCountry(ctx context.Context, req *pb.GetCountryRequest) (*pb.Country, error) {
 	country, err := h.countryRepo.GetById(ctx, req.Id)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
@@ -45,7 +44,7 @@ func (h *CountryHandler) GetCountry(ctx context.Context, req *entity.GetCountryR
 	return country, nil
 }
 
-func (h *CountryHandler) ListCountries(ctx context.Context, req *emptypb.Empty) (*entity.ListCountriesResponse, error) {
+func (h *CountryHandler) ListCountries(ctx context.Context, req *emptypb.Empty) (*pb.ListCountriesResponse, error) {
 	countries, err := h.countryRepo.GetAll(ctx)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
@@ -54,15 +53,15 @@ func (h *CountryHandler) ListCountries(ctx context.Context, req *emptypb.Empty) 
 		return nil, status.Error(codes.Internal, err.Error())
 	}
 
-	response := &entity.ListCountriesResponse{
+	response := &pb.ListCountriesResponse{
 		Countries: countries,
 	}
 
 	return response, nil
 }
 
-func (h *CountryHandler) UpdateCountry(ctx context.Context, req *entity.UpdateCountryRequest) (*entity.Country, error) {
-	country := &entity.Country{
+func (h *CountryHandler) UpdateCountry(ctx context.Context, req *pb.UpdateCountryRequest) (*pb.Country, error) {
+	country := &pb.Country{
 		Name:   req.Name,
 		Prefix: req.Prefix,
 	}
@@ -74,7 +73,7 @@ func (h *CountryHandler) UpdateCountry(ctx context.Context, req *entity.UpdateCo
 	return country, nil
 }
 
-func (h *CountryHandler) DeleteCountry(ctx context.Context, req *entity.DeleteCountryRequest) (*emptypb.Empty, error) {
+func (h *CountryHandler) DeleteCountry(ctx context.Context, req *pb.DeleteCountryRequest) (*emptypb.Empty, error) {
 	if err := h.countryRepo.DeleteById(ctx, req.Id); err != nil {
 		return nil, status.Error(codes.Internal, err.Error())
 	}

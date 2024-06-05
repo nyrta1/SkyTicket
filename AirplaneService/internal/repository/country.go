@@ -1,7 +1,7 @@
 package repository
 
 import (
-	"AirplaneService/internal/entity"
+	"SkyTicket/proto/pb"
 	"context"
 	"database/sql"
 	_ "github.com/lib/pq"
@@ -15,17 +15,17 @@ func NewCountryRepository(db *sql.DB) *CountryRepository {
 	return &CountryRepository{db: db}
 }
 
-func (repo *CountryRepository) Add(ctx context.Context, country *entity.Country) error {
+func (repo *CountryRepository) Add(ctx context.Context, country *pb.Country) error {
 	query := `INSERT INTO country (name, prefix) VALUES ($1, $2)`
 	_, err := repo.db.ExecContext(ctx, query, country.Name, country.Prefix)
 	return err
 }
 
-func (repo *CountryRepository) GetById(ctx context.Context, id int64) (*entity.Country, error) {
+func (repo *CountryRepository) GetById(ctx context.Context, id int64) (*pb.Country, error) {
 	query := `SELECT id, name, prefix FROM country WHERE id=$1`
 	row := repo.db.QueryRowContext(ctx, query, id)
 
-	var country entity.Country
+	var country pb.Country
 	err := row.Scan(&country.Id, &country.Name, &country.Prefix)
 	if err != nil {
 		return nil, err
@@ -34,7 +34,7 @@ func (repo *CountryRepository) GetById(ctx context.Context, id int64) (*entity.C
 	return &country, nil
 }
 
-func (repo *CountryRepository) GetAll(ctx context.Context) ([]*entity.Country, error) {
+func (repo *CountryRepository) GetAll(ctx context.Context) ([]*pb.Country, error) {
 	query := `SELECT id, name, prefix FROM country`
 	rows, err := repo.db.QueryContext(ctx, query)
 	if err != nil {
@@ -42,9 +42,9 @@ func (repo *CountryRepository) GetAll(ctx context.Context) ([]*entity.Country, e
 	}
 	defer rows.Close()
 
-	var countries []*entity.Country
+	var countries []*pb.Country
 	for rows.Next() {
-		var country entity.Country
+		var country pb.Country
 		err := rows.Scan(&country.Id, &country.Name, &country.Prefix)
 		if err != nil {
 			return nil, err
@@ -55,7 +55,7 @@ func (repo *CountryRepository) GetAll(ctx context.Context) ([]*entity.Country, e
 	return countries, nil
 }
 
-func (repo *CountryRepository) UpdateById(ctx context.Context, id int64, country *entity.Country) error {
+func (repo *CountryRepository) UpdateById(ctx context.Context, id int64, country *pb.Country) error {
 	query := `UPDATE country SET name=$1, prefix=$2 WHERE id=$3`
 	_, err := repo.db.ExecContext(ctx, query, country.Name, country.Prefix, id)
 	return err

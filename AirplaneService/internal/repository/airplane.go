@@ -1,7 +1,7 @@
 package repository
 
 import (
-	"AirplaneService/internal/entity"
+	"SkyTicket/proto/pb"
 	"context"
 	"database/sql"
 	_ "github.com/lib/pq"
@@ -16,7 +16,7 @@ func NewAirplaneRepository(db *sql.DB) *AirplaneRepository {
 	return &AirplaneRepository{db: db}
 }
 
-func (repo *AirplaneRepository) Add(ctx context.Context, airplane *entity.Airplane) error {
+func (repo *AirplaneRepository) Add(ctx context.Context, airplane *pb.Airplane) error {
 	query := `INSERT INTO airplane (manufacturer_id, manufacturer_year, first_slot_capacity, 
 		economy_slot_capacity, country_origin_id, created_at) 
 		VALUES ($1, $2, $3, $4, $5, $6)`
@@ -25,11 +25,11 @@ func (repo *AirplaneRepository) Add(ctx context.Context, airplane *entity.Airpla
 	return err
 }
 
-func (repo *AirplaneRepository) GetById(ctx context.Context, id int64) (*entity.Airplane, error) {
+func (repo *AirplaneRepository) GetById(ctx context.Context, id int64) (*pb.Airplane, error) {
 	query := `SELECT id, manufacturer_id, manufacturer_year, first_slot_capacity, economy_slot_capacity, country_origin_id FROM airplane WHERE id = $1`
 	row := repo.db.QueryRowContext(ctx, query, id)
 
-	var airplane entity.Airplane
+	var airplane pb.Airplane
 	err := row.Scan(&airplane.Id, &airplane.ManufacturerId, &airplane.ManufacturerYear,
 		&airplane.FirstSlotCapacity, &airplane.EconomySlotCapacity, &airplane.CountryOriginId)
 	if err != nil {
@@ -39,7 +39,7 @@ func (repo *AirplaneRepository) GetById(ctx context.Context, id int64) (*entity.
 	return &airplane, nil
 }
 
-func (repo *AirplaneRepository) GetAll(ctx context.Context) ([]*entity.Airplane, error) {
+func (repo *AirplaneRepository) GetAll(ctx context.Context) ([]*pb.Airplane, error) {
 	query := `SELECT id, manufacturer_id, manufacturer_year, first_slot_capacity, economy_slot_capacity, country_origin_id FROM airplane`
 	rows, err := repo.db.QueryContext(ctx, query)
 	if err != nil {
@@ -47,9 +47,9 @@ func (repo *AirplaneRepository) GetAll(ctx context.Context) ([]*entity.Airplane,
 	}
 	defer rows.Close()
 
-	var airplanes []*entity.Airplane
+	var airplanes []*pb.Airplane
 	for rows.Next() {
-		var airplane entity.Airplane
+		var airplane pb.Airplane
 		err := rows.Scan(&airplane.Id, &airplane.ManufacturerId, &airplane.ManufacturerYear,
 			&airplane.FirstSlotCapacity, &airplane.EconomySlotCapacity, &airplane.CountryOriginId)
 		if err != nil {
@@ -61,7 +61,7 @@ func (repo *AirplaneRepository) GetAll(ctx context.Context) ([]*entity.Airplane,
 	return airplanes, nil
 }
 
-func (repo *AirplaneRepository) UpdateById(ctx context.Context, id int64, airplane *entity.Airplane) error {
+func (repo *AirplaneRepository) UpdateById(ctx context.Context, id int64, airplane *pb.Airplane) error {
 	query := `UPDATE airplane SET manufacturer_id=$1, manufacturer_year=$2, first_slot_capacity=$3, 
 		economy_slot_capacity=$4, country_origin_id=$5, updated_at=$6 WHERE id=$7`
 	_, err := repo.db.ExecContext(ctx, query, airplane.ManufacturerId, airplane.ManufacturerYear,
