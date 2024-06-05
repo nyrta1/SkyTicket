@@ -1,7 +1,7 @@
 package repository
 
 import (
-	"SkyTicket/entity"
+	"SkyTicket/BookingService/entity"
 	"context"
 	"database/sql"
 )

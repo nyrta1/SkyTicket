@@ -1,11 +1,10 @@
 package main
 
 import (
-	"AirplaneService/internal/controller"
-	grpcc "AirplaneService/internal/grpc"
-	"AirplaneService/internal/gw"
-	"AirplaneService/internal/repository"
-	"AirplaneService/pkg/logger"
+	"SkyTicket/AirplaneService/internal/controller"
+	"SkyTicket/AirplaneService/internal/repository"
+	"SkyTicket/pkg/logger"
+	"SkyTicket/proto/pb"
 	"context"
 	"log"
 	"net"
@@ -83,9 +82,9 @@ func startGrpcServer() error {
 
 	grpcServer := grpc.NewServer()
 
-	grpcc.RegisterAirplaneServiceServer(grpcServer, airportHandler)
-	grpcc.RegisterCountryServiceServer(grpcServer, countryHandler)
-	grpcc.RegisterManufacturerServiceServer(grpcServer, manufacturerHandler)
+	pb.RegisterAirplaneServiceServer(grpcServer, airportHandler)
+	pb.RegisterCountryServiceServer(grpcServer, countryHandler)
+	pb.RegisterManufacturerServiceServer(grpcServer, manufacturerHandler)
 
 	reflection.Register(grpcServer)
 
@@ -109,15 +108,15 @@ func startHttpServer(ctx context.Context) error {
 		grpc.WithInsecure(),
 	}
 
-	err1 := gw.RegisterAirplaneServiceHandlerFromEndpoint(ctx, mux, grpcAddress, opts)
+	err1 := pb.RegisterAirplaneServiceHandlerFromEndpoint(ctx, mux, grpcAddress, opts)
 	if err1 != nil {
 		return err1
 	}
-	err2 := gw.RegisterCountryServiceHandlerFromEndpoint(ctx, mux, grpcAddress, opts)
+	err2 := pb.RegisterCountryServiceHandlerFromEndpoint(ctx, mux, grpcAddress, opts)
 	if err2 != nil {
 		return err2
 	}
-	err3 := gw.RegisterManufacturerServiceHandlerFromEndpoint(ctx, mux, grpcAddress, opts)
+	err3 := pb.RegisterManufacturerServiceHandlerFromEndpoint(ctx, mux, grpcAddress, opts)
 	if err3 != nil {
 		return err3
 	}

@@ -1,0 +1,146 @@
+syntax = "proto3";
+package grpc;
+
+import "google/protobuf/timestamp.proto";
+import "googleapis/google/api/annotations.proto";
+option go_package = "../AuthService";
+message User {
+  int64 id = 1;
+  string name=2;
+  string email = 3;
+  string password = 4;
+  google.protobuf.Timestamp created_at = 5;
+  google.protobuf.Timestamp updated_at = 6;
+}
+
+message Role {
+  int64 id = 1;
+  string name = 2;
+  google.protobuf.Timestamp created_at = 3;
+  google.protobuf.Timestamp updated_at = 4;
+}
+
+message GetUserRequest {
+  int64 id = 1;
+}
+
+message GetUserByEmailRequest {
+  string email = 1;
+}
+
+message DeleteUserRequest {
+  int64 id = 1;
+}
+
+message ListUserRequest {
+  int64 limit = 1;
+}
+
+message ListUserResponse {
+  repeated User user_list = 1;
+  int64 total = 2;
+}
+
+message RegisterRequest {
+  string email = 1;
+  string password = 2;
+  string phone_number = 3;
+}
+
+message RegisterResponse {
+  int64 user_id = 1;
+  string jwt_token = 2;
+}
+
+message LoginRequest {
+  int64 id=1;
+  string email = 2;
+  string password = 3;
+}
+
+message LoginResponse {
+  string jwt_token = 1;
+}
+
+message ParseTokenRequest {
+  string token = 1;
+}
+
+message ParseTokenResponse {
+  User user = 1;
+}
+
+message UpdateUserPasswordRequest {
+  int64 id = 1;
+  string old_password = 2;
+  string password = 3;
+}
+
+message GetRoleRequest {
+  int64 id = 1;
+}
+
+message UpdateUserRequest {
+  User user = 1;
+}
+
+service UserManager {
+  rpc CreateUser (User) returns (User) {
+    option (google.api.http) = {
+      post: "/v1/users"
+      body: "*"
+    };
+  }
+
+  rpc UpdateUser (UpdateUserRequest) returns (User) {
+    option (google.api.http) = {
+      put: "/v1/users/{user.id}"
+      body: "*"
+    };
+  }
+
+  rpc UpdateUserPassword (UpdateUserPasswordRequest) returns (User) {
+    option (google.api.http) = {
+      put: "/v1/users/{id}/password"
+      body: "*"
+    };
+  }
+
+  rpc GetRole (GetRoleRequest) returns (Role) {
+    option (google.api.http) = {
+      get: "/v1/roles/{id}"
+    };
+  }
+
+  rpc GetUser (GetUserRequest) returns (User) {
+    option (google.api.http) = {
+      get: "/v1/users/{id}"
+    };
+  }
+
+  rpc GetUserByEmail (GetUserByEmailRequest) returns (User) {
+    option (google.api.http) = {
+      get: "/v1/users/email/{email}"
+    };
+  }
+
+  rpc ListUser (ListUserRequest) returns (ListUserResponse) {
+    option (google.api.http) = {
+      get: "/v1/users"
+    };
+  }
+
+  rpc Login (LoginRequest) returns (LoginResponse) {
+    option (google.api.http) = {
+      post: "/v1/login"
+      body: "*"
+    };
+  }
+
+  rpc ParseToken (ParseTokenRequest) returns (ParseTokenResponse) {
+    option (google.api.http) = {
+      post: "/v1/parseToken"
+      body: "*"
+    };
+  }
+}

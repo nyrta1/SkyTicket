@@ -1,7 +1,7 @@
 package repository
 
 import (
-	"AirplaneService/internal/entity"
+	"SkyTicket/proto/pb"
 	"context"
 	"database/sql"
 	"errors"
@@ -19,9 +19,9 @@ func NewManufacturerRepository(db *sql.DB) *ManufacturerRepository {
 	return &ManufacturerRepository{Db: db}
 }
 
-func (r *ManufacturerRepository) Add(ctx context.Context, entity *entity.Manufacturer) error {
+func (r *ManufacturerRepository) Add(ctx context.Context, pb *pb.Manufacturer) error {
 	sqlQuery := "INSERT INTO manufacturer (name) VALUES ($1)"
-	_, err := r.Db.ExecContext(ctx, sqlQuery, entity.Name)
+	_, err := r.Db.ExecContext(ctx, sqlQuery, pb.Name)
 	if err != nil {
 		log.Println("Error adding manufacturer:", err)
 		return err
@@ -29,10 +29,10 @@ func (r *ManufacturerRepository) Add(ctx context.Context, entity *entity.Manufac
 	return nil
 }
 
-func (r *ManufacturerRepository) GetById(ctx context.Context, id int64) (*entity.Manufacturer, error) {
+func (r *ManufacturerRepository) GetById(ctx context.Context, id int64) (*pb.Manufacturer, error) {
 	sqlQuery := "SELECT id, name FROM manufacturer WHERE id=$1"
 	row := r.Db.QueryRowContext(ctx, sqlQuery, id)
-	var manufacturer entity.Manufacturer
+	var manufacturer pb.Manufacturer
 	err := row.Scan(&manufacturer.Id, &manufacturer.Name)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
@@ -44,7 +44,7 @@ func (r *ManufacturerRepository) GetById(ctx context.Context, id int64) (*entity
 	return &manufacturer, nil
 }
 
-func (r *ManufacturerRepository) GetAll(ctx context.Context) ([]*entity.Manufacturer, error) {
+func (r *ManufacturerRepository) GetAll(ctx context.Context) ([]*pb.Manufacturer, error) {
 	sqlQuery := "SELECT id, name FROM manufacturer"
 	rows, err := r.Db.QueryContext(ctx, sqlQuery)
 	if err != nil {
@@ -54,9 +54,9 @@ func (r *ManufacturerRepository) GetAll(ctx context.Context) ([]*entity.Manufact
 	defer rows.Close()
 	fmt.Println("1", rows)
 
-	var manufacturers []*entity.Manufacturer
+	var manufacturers []*pb.Manufacturer
 	for rows.Next() {
-		var manufacturer entity.Manufacturer
+		var manufacturer pb.Manufacturer
 		err := rows.Scan(&manufacturer.Id, &manufacturer.Name)
 		if err != nil {
 			log.Println("Error scanning manufacturer:", err)
@@ -74,9 +74,9 @@ func (r *ManufacturerRepository) GetAll(ctx context.Context) ([]*entity.Manufact
 	return manufacturers, nil
 }
 
-func (r *ManufacturerRepository) UpdateById(ctx context.Context, id int64, entity *entity.Manufacturer) error {
+func (r *ManufacturerRepository) UpdateById(ctx context.Context, id int64, pb *pb.Manufacturer) error {
 	sqlQuery := "UPDATE manufacturer SET name=$1 WHERE id=$2"
-	_, err := r.Db.ExecContext(ctx, sqlQuery, entity.Name, id)
+	_, err := r.Db.ExecContext(ctx, sqlQuery, pb.Name, id)
 	if err != nil {
 		log.Println("Error updating manufacturer by ID:", err)
 		return err

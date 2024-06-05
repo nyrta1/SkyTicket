@@ -1,29 +1,27 @@
 package main
 
 import (
+	"SkyTicket/AuthService/handlers"
+	repository "SkyTicket/AuthService/repo"
 	"SkyTicket/pkg/logger"
+	"SkyTicket/proto/pb"
+	"context"
+	"database/sql"
 	"fmt"
+	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
+	"github.com/joho/godotenv"
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/reflection"
 	"log"
 	"net"
 	"net/http"
 	"os"
 	"sync"
-
-	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
-	"github.com/joho/godotenv"
-	"golang.org/x/net/context"
-
-	"SkyTicket/BookingService/handlers"
-	repository "SkyTicket/BookingService/repo"
-	"SkyTicket/proto/pb"
-	"database/sql"
-	"google.golang.org/grpc"
-	"google.golang.org/grpc/reflection"
 )
 
 const (
-	grpcAddress = "localhost:50051"
-	httpAddress = "localhost:8080"
+	grpcAddress = "localhost:50052"
+	httpAddress = "localhost:8082"
 )
 
 func main() {
@@ -58,21 +56,17 @@ func startGrpcServer() error {
 	}
 	defer dbConn.Close()
 	models := repository.NewModels(dbConn)
-	conn, err := grpc.Dial("localhost:50052", grpc.WithInsecure())
-	conn2, err := grpc.Dial("localhost:50053", grpc.WithInsecure())
-
 	if err != nil {
 		return fmt.Errorf("failed: %v", err)
 	}
-	userClient := pb.NewUserManagerClient(conn)
-	airplaneClient := pb.NewAirplaneServiceClient(conn2)
-	bookingHandler, err := handlers.NewBookingHandler(&models.Booking, userClient, airplaneClient)
+	userHandler, err := handlers.NewUserHandler(&models.User)
+
 	if err != nil {
 		return fmt.Errorf("failed to create booking handler: %v", err)
 	}
 
 	grpcServer := grpc.NewServer()
-	pb.RegisterBookingManagerServer(grpcServer, bookingHandler)
+	pb.RegisterUserManagerServer(grpcServer, userHandler)
 	reflection.Register(grpcServer)
 
 	list, err := net.Listen("tcp", grpcAddress)
@@ -93,8 +87,7 @@ func startHttpServer(ctx context.Context) error {
 	opts := []grpc.DialOption{
 		grpc.WithInsecure(),
 	}
-
-	err := pb.RegisterBookingManagerHandlerFromEndpoint(ctx, mux, grpcAddress, opts)
+	err := pb.RegisterUserManagerHandlerFromEndpoint(ctx, mux, grpcAddress, opts)
 	if err != nil {
 		return fmt.Errorf("failed to register HTTP handler: %v", err)
 	}
