@@ -1,19 +1,138 @@
 syntax = "proto3";
+package grpc;
+import "google/protobuf/timestamp.proto";
+import "BookingService/googleapis/google/api/annotations.proto";
 
-package public;
+option go_package = "./;pb";
 
 message User {
   int64 id = 1;
-  string name = 2;
-  string surname = 3;
-  string email = 4;
-  string password = 5;
+  string email = 2;
+  string password = 3;
+  int64 customer_id = 4;
+  int64 access_id = 5;
   google.protobuf.Timestamp created_at = 6;
   google.protobuf.Timestamp updated_at = 7;
 }
-
-message Users {
-  repeated User users = 1;
+message GetUserRequest {
+  int64 id = 1;
 }
 
-import "google/protobuf/timestamp.proto";
+message GetUserByEmailRequest {
+  string email = 1;
+}
+
+message DeleteUserRequest {
+  int64 id = 1;
+}
+
+message ListUserRequest {
+  int64 page = 1;
+  int64 limit = 2;
+}
+
+message ListUserResponse {
+  repeated User user_list = 1;
+  int64 total = 2;
+  int64 page = 3;
+}
+
+message RegisterRequest {
+  int64 id = 1;
+  string email = 2;
+  string password = 3;
+  string address = 5;
+  string phone_number = 6;
+}
+
+message RegisterResponse {
+  int64 user_id = 1;
+  string jwt_token = 3;
+}
+
+message LoginRequest {
+  string email = 1;
+  string password = 2;
+}
+
+message LoginResponse {
+  int64 id = 1;
+  string token = 2;
+}
+
+message ParseTokenRequest {
+    string token = 1;
+}
+
+message ParseTokenResponse {
+    User user = 1;
+}
+
+
+message UpdateUserPasswordRequest {
+  int64 id = 1;
+  string old_password = 3;
+  string password = 2;
+}
+
+message GetAccessLevelRequest {
+  int64 id = 1;
+}
+
+service UserManager {
+  rpc CreateUser (User) returns (User);
+  rpc UpdateUserPassword (UpdateUserPasswordRequest) returns (User);
+  rpc GetUser (GetUserRequest) returns (User);
+  rpc GetUserByEmail (GetUserByEmailRequest) returns (User);
+  rpc ListUser (ListUserRequest) returns (ListUserResponse);
+  rpc RegisterCustomer (RegisterRequest) returns (RegisterResponse);
+  rpc Login (LoginRequest) returns (LoginResponse);
+  rpc ParseToken (ParseTokenRequest) returns (ParseTokenResponse);
+
+  // Automatically generate HTTP gateway endpoints for all methods
+  rpc CreateUser (CreateUserRequest) returns (User) {
+    option (google.api.http) = {
+      post: "/v1/user"
+      body: "*"
+    };
+  }
+  rpc UpdateUserPassword (UpdateUserPasswordRequest) returns (User) {
+    option (google.api.http) = {
+      put: "/v1/user/password"
+      body: "*"
+    };
+  }
+  rpc GetUser (GetUserRequest) returns (User) {
+    option (google.api.http) = {
+      get: "/v1/user/{id}"
+    };
+  }
+  rpc GetUserByEmail (GetUserByEmailRequest) returns (User) {
+    option (google.api.http) = {
+      get: "/v1/user/email/{email}"
+    };
+  }
+  rpc ListUser (ListUserRequest) returns (ListUserResponse) {
+    option (google.api.http) = {
+      get: "/v1/users"
+    };
+  }
+  rpc RegisterCustomer (RegisterRequest) returns (RegisterResponse) {
+    option (google.api.http) = {
+      post: "/v1/register"
+      body: "*"
+    };
+  }
+  rpc Login (LoginRequest) returns (LoginResponse) {
+    option (google.api.http) = {
+      post: "/v1/login"
+      body: "*"
+    };
+  }
+  rpc ParseToken (ParseTokenRequest) returns (ParseTokenResponse) {
+    option (google.api.http) = {
+      post: "/v1/token/parse"
+      body: "*"
+    };
+  }
+}
