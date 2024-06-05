@@ -6,13 +6,16 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
 import java.sql.Timestamp;
-import java.time.Instant;
 import java.util.List;
 
 @Repository
 public class AirplaneRepository implements SqlCrudOperation<AirplaneEntity.Airplane> {
+    private final JdbcTemplate jdbcTemplate;
+
     @Autowired
-    private JdbcTemplate jdbcTemplate;
+    public AirplaneRepository(JdbcTemplate jdbcTemplate) {
+        this.jdbcTemplate = jdbcTemplate;
+    }
 
     @Override
     public void add(AirplaneEntity.Airplane airplane) {

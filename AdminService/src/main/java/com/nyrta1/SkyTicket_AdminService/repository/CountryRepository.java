@@ -9,8 +9,12 @@ import java.util.List;
 
 @Repository
 public class CountryRepository implements SqlCrudOperation<CountryEntity.Country> {
+    private final JdbcTemplate jdbcTemplate;
+
     @Autowired
-    private JdbcTemplate jdbcTemplate;
+    public CountryRepository(JdbcTemplate jdbcTemplate) {
+        this.jdbcTemplate = jdbcTemplate;
+    }
 
     @Override
     public void add(CountryEntity.Country country) {

@@ -9,8 +9,12 @@ import java.util.List;
 
 @Repository
 public class ManufacturerRepository implements SqlCrudOperation<ManufacturerEntity.Manufacturer> {
+    private final JdbcTemplate jdbcTemplate;
+
     @Autowired
-    private JdbcTemplate jdbcTemplate;
+    public ManufacturerRepository(JdbcTemplate jdbcTemplate) {
+        this.jdbcTemplate = jdbcTemplate;
+    }
 
     @Override
     public void add(ManufacturerEntity.Manufacturer entity) {
