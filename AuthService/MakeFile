@@ -1,0 +1,4 @@
+
+protoc:
+	protoc --go_out=../AuthService/pb --go-grpc_out=../pb --grpc-gateway_out=../pb --go_opt=paths=source_relative --go-grpc_opt=paths=source_relative --grpc-gateway_opt=paths=source_relative ../auth.proto
+
