@@ -1,12 +1,84 @@
 syntax = "proto3";
 
-option java_package = "com.nyrta1.SkyTicket_AdminService.models";
-option java_outer_classname = "ManufacturerEntity";
-
 import "google/protobuf/timestamp.proto";
+import "google/protobuf/empty.proto";
+import "googleapis/google/api/annotations.proto";
 
+option go_package = "./AirplaneService/internal/entity";
+
+// Manufacturer message definition
 message Manufacturer {
   int64 id = 1;
   string name = 2;
   google.protobuf.Timestamp created_at = 3;
+}
+
+// Request message for creating a Manufacturer
+message CreateManufacturerRequest {
+  Manufacturer manufacturer = 1;
+}
+
+// Response message for a single Manufacturer
+message ManufacturerResponse {
+  Manufacturer manufacturer = 1;
+}
+
+// Request message for retrieving a Manufacturer by ID
+message GetManufacturerRequest {
+  int64 id = 1;
+}
+
+// Request message for updating a Manufacturer
+message UpdateManufacturerRequest {
+  Manufacturer manufacturer = 1;
+}
+
+// Request message for deleting a Manufacturer by ID
+message DeleteManufacturerRequest {
+  int64 id = 1;
+}
+
+// List all Manufacturers response
+message ListManufacturersResponse {
+  repeated Manufacturer manufacturers = 1;
+}
+
+// Manufacturer service definition
+service ManufacturerService {
+  // Create a new Manufacturer
+  rpc CreateManufacturer(CreateManufacturerRequest) returns (ManufacturerResponse) {
+    option (google.api.http) = {
+      post: "/manufacturers"
+      body: "manufacturer"
+    };
+  }
+
+  // Get a Manufacturer by ID
+  rpc GetManufacturer(GetManufacturerRequest) returns (ManufacturerResponse) {
+    option (google.api.http) = {
+      get: "/manufacturers/{id}"
+    };
+  }
+
+  // Update a Manufacturer
+  rpc UpdateManufacturer(UpdateManufacturerRequest) returns (ManufacturerResponse) {
+    option (google.api.http) = {
+      put: "/manufacturers/{manufacturer.id}"
+      body: "manufacturer"
+    };
+  }
+
+  // Delete a Manufacturer by ID
+  rpc DeleteManufacturer(DeleteManufacturerRequest) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      delete: "/manufacturers/{id}"
+    };
+  }
+
+  // List all Manufacturers
+  rpc ListManufacturers(google.protobuf.Empty) returns (ListManufacturersResponse) {
+    option (google.api.http) = {
+      get: "/manufacturers"
+    };
+  }
 }

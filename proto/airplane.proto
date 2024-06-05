@@ -1,10 +1,12 @@
 syntax = "proto3";
 
-option java_package = "com.nyrta1.SkyTicket_AdminService.models";
-option java_outer_classname = "AirplaneEntity";
-
 import "google/protobuf/timestamp.proto";
+import "google/protobuf/empty.proto";
+import "googleapis/google/api/annotations.proto";
 
+option go_package = "./AirplaneService/internal/entity";
+
+// Message definition for Airplane
 message Airplane {
   int64 id = 1;
   int32 manufacturer_id = 2;
@@ -14,4 +16,64 @@ message Airplane {
   int32 country_origin_id = 6;
   google.protobuf.Timestamp created_at = 7;
   google.protobuf.Timestamp updated_at = 8;
+}
+
+// Request message for GetAirplane
+message GetAirplaneRequest {
+  int64 id = 1;
+}
+
+// Request message for CreateAirplane
+message CreateAirplaneRequest {
+  Airplane airplane = 1;
+}
+
+// Request message for UpdateAirplane
+message UpdateAirplaneRequest {
+  Airplane airplane = 1;
+}
+
+// Request message for DeleteAirplane
+message DeleteAirplaneRequest {
+  int64 id = 1;
+}
+
+// Response message for ListAirplanes
+message ListAirplanesResponse {
+  repeated Airplane airplanes = 1;
+}
+
+// Airplane service definition
+service AirplaneService {
+  rpc GetAirplane(GetAirplaneRequest) returns (Airplane) {
+    option (google.api.http) = {
+      get: "/airplanes/{id}"
+    };
+  }
+
+  rpc CreateAirplane(CreateAirplaneRequest) returns (Airplane) {
+    option (google.api.http) = {
+      post: "/airplanes"
+      body: "airplane"
+    };
+  }
+
+  rpc UpdateAirplane(UpdateAirplaneRequest) returns (Airplane) {
+    option (google.api.http) = {
+      put: "/airplanes"
+      body: "airplane"
+    };
+  }
+
+  rpc DeleteAirplane(DeleteAirplaneRequest) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      delete: "/airplanes/{id}"
+    };
+  }
+
+  rpc ListAirplanes(google.protobuf.Empty) returns (ListAirplanesResponse) {
+    option (google.api.http) = {
+      get: "/airplanes"
+    };
+  }
 }
