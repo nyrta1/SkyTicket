@@ -25,9 +25,19 @@ type Ticket struct {
 	Name string `json:"name,omitempty"`
 }
 
-func (r *BookingModel) GetTicketClass(ctx context.Context, id int64) (*Ticket, error) {
-	//TODO implement me
-	panic("implement me")
+func (r *BookingModel) GetTicketClass(ctx context.Context, name string) (*Ticket, error) {
+	query := "SELECT id, name FROM ticket WHERE name = $1"
+	row := r.Db.QueryRowContext(ctx, query, name)
+	var ticket Ticket
+	err := row.Scan(&ticket.ID, &ticket.Name)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return nil, sql.ErrNoRows
+		}
+		return nil, err
+	}
+
+	return &ticket, nil
 }
 
 func (r *BookingModel) CreateBooking(ctx context.Context, b *Booking) (*Booking, error) {

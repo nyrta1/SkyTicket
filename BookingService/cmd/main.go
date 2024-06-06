@@ -9,14 +9,14 @@ import (
 	"os"
 	"sync"
 
-	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
-	"github.com/joho/godotenv"
-	"golang.org/x/net/context"
-
 	"SkyTicket/BookingService/handlers"
 	repository "SkyTicket/BookingService/repo"
 	"SkyTicket/proto/pb"
 	"database/sql"
+	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
+	"github.com/joho/godotenv"
+	_ "github.com/lib/pq"
+	"golang.org/x/net/context"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
 )
@@ -50,7 +50,6 @@ func main() {
 
 	wg.Wait()
 }
-
 func startGrpcServer() error {
 	dbConn, err := ConnectDB()
 	if err != nil {
@@ -58,15 +57,24 @@ func startGrpcServer() error {
 	}
 	defer dbConn.Close()
 	models := repository.NewModels(dbConn)
-	conn, err := grpc.Dial("localhost:50052", grpc.WithInsecure())
-	conn2, err := grpc.Dial("localhost:50053", grpc.WithInsecure())
 
+	// Dial user gRPC server
+	conn, err := grpc.Dial("localhost:50052", grpc.WithInsecure())
 	if err != nil {
-		return fmt.Errorf("failed: %v", err)
+		return fmt.Errorf("failed to dial user gRPC server: %v", err)
 	}
+	defer conn.Close()
 	userClient := pb.NewUserManagerClient(conn)
-	airplaneClient := pb.NewAirplaneServiceClient(conn2)
-	bookingHandler, err := handlers.NewBookingHandler(&models.Booking, userClient, airplaneClient)
+
+	// Dial flight gRPC server
+	conn2, err := grpc.Dial("localhost:50053", grpc.WithInsecure())
+	if err != nil {
+		return fmt.Errorf("failed to dial flight gRPC server: %v", err)
+	}
+	defer conn2.Close()
+	flightClient := pb.NewFlightManagerClient(conn2)
+
+	bookingHandler, err := handlers.NewBookingHandler(&models.Booking, flightClient, userClient)
 	if err != nil {
 		return fmt.Errorf("failed to create booking handler: %v", err)
 	}
@@ -84,7 +92,6 @@ func startGrpcServer() error {
 
 	return grpcServer.Serve(list)
 }
-
 func startHttpServer(ctx context.Context) error {
 	log := logger.NewLogger()
 

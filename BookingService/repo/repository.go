@@ -8,7 +8,7 @@ import (
 
 type BookingRepository interface {
 	CreateBooking(ctx context.Context, b *entity.Booking) (*entity.Booking, error)
-	GetTicketClass(ctx context.Context, id int64) (*entity.Ticket, error)
+	GetTicketClass(ctx context.Context, name string) (*entity.Ticket, error)
 	UpdateBooking(ctx context.Context, id int64, b *entity.Booking) (*entity.Booking, error)
 	GetBookingByCode(ctx context.Context, code string) (*entity.Booking, error)
 	GetBookingHistory(ctx context.Context, customerId int64) ([]*entity.Booking, error)

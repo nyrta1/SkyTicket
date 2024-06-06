@@ -1,8 +1,8 @@
 package main
 
 import (
-	"SkyTicket/AuthService/handlers"
-	repository "SkyTicket/AuthService/repo"
+	"SkyTicket/FlightService/handlers"
+	repository "SkyTicket/FlightService/repo"
 	"SkyTicket/pkg/logger"
 	"SkyTicket/proto/pb"
 	"context"
@@ -21,8 +21,8 @@ import (
 )
 
 const (
-	grpcAddress = "localhost:50052"
-	httpAddress = "localhost:8081"
+	grpcAddress = "localhost:50053"
+	httpAddress = "localhost:8082"
 )
 
 func main() {
@@ -51,53 +51,62 @@ func main() {
 }
 
 func startGrpcServer() error {
+	// Connect to the database
 	dbConn, err := ConnectDB()
 	if err != nil {
 		return fmt.Errorf("database connection error: %v", err)
 	}
 	defer dbConn.Close()
+
+	// Create repository models
 	models := repository.NewModels(dbConn)
-	if err != nil {
-		return fmt.Errorf("failed: %v", err)
-	}
-	userHandler, err := handlers.NewUserHandler(&models.User)
 
+	// Create a new flight handler with the flight repository
+	flightHandler, err := handlers.NewFlightHandler(models.Flight)
 	if err != nil {
-		return fmt.Errorf("failed to create booking handler: %v", err)
+		return fmt.Errorf("failed to create flight handler: %v", err)
 	}
 
+	// Create a new gRPC server
 	grpcServer := grpc.NewServer()
-	pb.RegisterUserManagerServer(grpcServer, userHandler)
+
+	// Register flight handler with the gRPC server
+	pb.RegisterFlightManagerServer(grpcServer, flightHandler)
+
+	// Register reflection service on gRPC server
 	reflection.Register(grpcServer)
 
-	list, err := net.Listen("tcp", grpcAddress)
+	// Listen for incoming connections on the specified address
+	listener, err := net.Listen("tcp", grpcAddress)
 	if err != nil {
 		return fmt.Errorf("failed to listen: %v", err)
 	}
 
-	log.Printf("gRPC server listening at %v\n", grpcAddress)
-
-	return grpcServer.Serve(list)
+	// Serve gRPC server
+	log.Printf("gRPC server listening at %s\n", grpcAddress)
+	return grpcServer.Serve(listener)
 }
 
 func startHttpServer(ctx context.Context) error {
+	// Create a new logger
 	log := logger.NewLogger()
 
+	// Create a new ServeMux
 	mux := runtime.NewServeMux()
 
-	opts := []grpc.DialOption{
-		grpc.WithInsecure(),
-	}
-	err := pb.RegisterUserManagerHandlerFromEndpoint(ctx, mux, grpcAddress, opts)
+	// Create gRPC dial options
+	opts := []grpc.DialOption{grpc.WithInsecure()}
+
+	// Register flight manager handler from endpoint
+	err := pb.RegisterFlightManagerHandlerFromEndpoint(ctx, mux, grpcAddress, opts)
 	if err != nil {
 		return fmt.Errorf("failed to register HTTP handler: %v", err)
 	}
 
-	log.Printf("HTTP server listening at %v\n", httpAddress)
-
+	// Listen and serve HTTP requests
+	log.Printf("HTTP server listening at %s\n", httpAddress)
 	return http.ListenAndServe(httpAddress, mux)
 }
-
 func ConnectDB() (*sql.DB, error) {
 	newLogger := logger.NewLogger()
 	err := godotenv.Load()
