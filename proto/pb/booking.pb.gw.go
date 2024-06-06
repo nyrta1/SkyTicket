@@ -2,7 +2,7 @@
 // source: booking.proto
 
 /*
-Package BookingService is a reverse proxy.
+Package pb is a reverse proxy.
 
 It translates gRPC into RESTful JSON APIs.
 */

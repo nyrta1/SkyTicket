@@ -1,7 +1,7 @@
 package middleware
 
 import (
-	"AuthService/internal/auth"
+	"SkyTicket/AuthService/internal/auth"
 	"golang.org/x/net/context"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/metadata"

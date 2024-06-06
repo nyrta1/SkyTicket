@@ -23,16 +23,29 @@ type UserHandler struct {
 }
 
 func JWTUnaryInterceptor(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (interface{}, error) {
-	email, err := middleware.JWTMiddleware(ctx)
-	if err != nil {
-		return nil, err
+	// Check if the RPC method is one that requires authentication
+	if shouldAuthenticate(info.FullMethod) {
+		// If so, perform JWT token authentication
+		email, err := middleware.JWTMiddleware(ctx)
+		if err != nil {
+			return nil, err
+		}
+		ctx = context.WithValue(ctx, "email", email)
 	}
-
-	ctx = context.WithValue(ctx, "email", email)
-
 	return handler(ctx, req)
 }
-
+func shouldAuthenticate(method string) bool {
+	authenticatedMethods := []string{
+		"/grpc.UserManager/ParseToken",
+		// Add other RPC methods that require authentication here
+	}
+	for _, authenticatedMethod := range authenticatedMethods {
+		if method == authenticatedMethod {
+			return true
+		}
+	}
+	return false
+}
 func NewUserHandler(userRepo repo.UserRepository) (*UserHandler, error) {
 	return &UserHandler{
 		userRepo: userRepo,
@@ -40,12 +53,8 @@ func NewUserHandler(userRepo repo.UserRepository) (*UserHandler, error) {
 }
 
 func (h *UserHandler) GetUser(ctx context.Context, req *pb.GetUserRequest) (*pb.User, error) {
-	email, err := middleware.JWTMiddleware(ctx)
-	if err != nil {
-		return nil, err
-	}
-
-	u, err := h.userRepo.GetUserByEmail(ctx, email)
+	userID := req.Id
+	u, err := h.userRepo.GetUser(ctx, userID)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			return nil, status.Error(codes.NotFound, "user not found")
@@ -55,10 +64,12 @@ func (h *UserHandler) GetUser(ctx context.Context, req *pb.GetUserRequest) (*pb.
 
 	pUser := &pb.User{
 		Id:        u.ID,
+		Name:      u.Name,
 		Email:     u.Email,
 		CreatedAt: timestamppb.New(u.CreatedAt),
 		UpdatedAt: timestamppb.New(u.UpdatedAt),
 	}
+
 	return pUser, nil
 }
 
