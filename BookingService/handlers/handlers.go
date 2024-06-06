@@ -115,7 +115,7 @@ func (h *BookingHandler) CreateBooking(ctx context.Context, req *pb.CreateBookin
 	}
 
 	// Retrieve ticket information
-	ticket, err := h.bookingRepo.GetTicketClass(ctx, req.TicketType)
+	ticket, err := h.bookingRepo.GetTicketClass(ctx, req.TicketId)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get ticket class: %v", err)
 	}
@@ -130,13 +130,13 @@ func (h *BookingHandler) CreateBooking(ctx context.Context, req *pb.CreateBookin
 	log.Printf("Flight information: %+v", flight)
 
 	// Check available slots based on ticket type
-	switch req.TicketType {
-	case "first":
-		if flight.AvailableFirstSlot == 0 {
+	switch req.TicketId {
+	case 1:
+		if flight.AvailableFirstSlot == 50 {
 			return nil, fmt.Errorf("first class seat is full")
 		}
-	case "economy":
-		if flight.AvailableEconomySlot == 0 {
+	case 2:
+		if flight.AvailableEconomySlot == 100 {
 			return nil, fmt.Errorf("economy class seat is full")
 		}
 	default:
@@ -163,11 +163,11 @@ func (h *BookingHandler) CreateBooking(ctx context.Context, req *pb.CreateBookin
 
 	// Log created booking information
 	log.Printf("Created booking information: %+v", createdBooking)
-
-	// Update flight slot
+	md := metadata.Pairs("update", "create")
+	ctx = metadata.NewOutgoingContext(ctx, md)
 	_, err = h.flightClient.UpdateFlightSlot(ctx, &pb.UpdateFlightSlotRequest{
-		Id:         createdBooking.FlightID,
-		TicketType: createdBooking.TicketID,
+		Id:       createdBooking.FlightID,
+		TicketId: createdBooking.TicketID,
 	})
 	if err != nil {
 		return nil, fmt.Errorf("failed to update flight slot: %v", err)
@@ -206,8 +206,8 @@ func (h *BookingHandler) CancelBooking(ctx context.Context, req *pb.CancelBookin
 	ctx = metadata.NewOutgoingContext(ctx, md)
 
 	_, err = h.flightClient.UpdateFlightSlot(ctx, &pb.UpdateFlightSlotRequest{
-		Id:         updatedBooking.FlightID,
-		TicketType: updatedBooking.TicketID,
+		Id:       updatedBooking.FlightID,
+		TicketId: updatedBooking.TicketID,
 	})
 	if err != nil {
 		return nil, status.Error(codes.Internal, err.Error())

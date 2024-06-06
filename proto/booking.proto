@@ -20,7 +20,7 @@ message CreateBookingRequest {
   int64 user_id=2;
   int64 flight_id=3;
   string status=4;
-  string ticket_type=5;
+  int64 ticket_id=5;
   google.protobuf.Timestamp created_at = 6;
   google.protobuf.Timestamp updated_at = 7;
 }

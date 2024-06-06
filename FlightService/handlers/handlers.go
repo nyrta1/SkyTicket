@@ -236,43 +236,48 @@ func (h *FlightHandler) ListFlight(ctx context.Context, req *pb.ListFlightReques
 	}
 	return pRes, nil
 }
-
 func (h *FlightHandler) UpdateFlightSlot(ctx context.Context, req *pb.UpdateFlightSlotRequest) (*pb.Flight, error) {
-	md, _ := metadata.FromIncomingContext(ctx)
-	if md["update"][0] == "create" {
-		fl, _ := h.flightRepo.GetFlightById(ctx, req.Id)
-		if req.TicketType == 2 {
-			fl.AvailableEconomySlot = fl.AvailableEconomySlot - 1
-		} else {
-			fl.AvailableFirstSlot = fl.AvailableFirstSlot - 1
-		}
-
-		updatedFlight, err := h.flightRepo.UpdateFlight(ctx, req.Id, fl)
-		if err != nil {
-			return nil, status.Error(codes.Internal, err.Error())
-		}
-		pRes := &pb.Flight{Id: updatedFlight.Id}
-		return pRes, nil
+	md, ok := metadata.FromIncomingContext(ctx)
+	if !ok {
+		return nil, status.Error(codes.Internal, "failed to get metadata from context")
 	}
 
-	// Add slot if calling from cancel booking
-	if md["update"][0] == "delete" {
-		fl, _ := h.flightRepo.GetFlightById(ctx, req.Id)
-		if req.TicketType == 2 {
-			fl.AvailableEconomySlot = fl.AvailableEconomySlot + 1
-		} else {
-			fl.AvailableFirstSlot = fl.AvailableFirstSlot + 1
-		}
-
-		updatedFlight, err := h.flightRepo.UpdateFlight(ctx, req.Id, fl)
-		if err != nil {
-			return nil, status.Error(codes.Internal, err.Error())
-		}
-		pRes := &pb.Flight{Id: updatedFlight.Id}
-		return pRes, nil
+	updateType, ok := md["update"]
+	if !ok || len(updateType) == 0 {
+		return nil, status.Error(codes.InvalidArgument, "update type not provided in metadata")
 	}
 
-	return nil, nil
+	fl, err := h.flightRepo.GetFlightById(ctx, req.Id)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return nil, status.Error(codes.NotFound, "flight not found")
+		}
+		return nil, status.Error(codes.Internal, "failed to get flight: "+err.Error())
+	}
+
+	switch updateType[0] {
+	case "create":
+		if req.TicketId == 2 {
+			fl.AvailableEconomySlot--
+		} else {
+			fl.AvailableFirstSlot--
+		}
+	case "delete":
+		if req.TicketId == 2 {
+			fl.AvailableEconomySlot++
+		} else {
+			fl.AvailableFirstSlot++
+		}
+	default:
+		return nil, status.Error(codes.InvalidArgument, "invalid update type provided")
+	}
+
+	updatedFlight, err := h.flightRepo.UpdateFlight(ctx, req.Id, fl)
+	if err != nil {
+		return nil, status.Error(codes.Internal, "failed to update flight: "+err.Error())
+	}
+
+	return &pb.Flight{Id: updatedFlight.Id}, nil
 }
 
 func (h *FlightHandler) DeleteFlight(ctx context.Context, req *pb.DeleteFlightRequest) (*empty.Empty, error) {

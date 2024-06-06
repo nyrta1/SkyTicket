@@ -42,7 +42,7 @@ func (m FlightRepository) UpdateFlight(ctx context.Context, id int64, f *Flight)
 	stmt := `UPDATE flights SET name=$1, from_location=$2, to_location=$3, departure_date=$4, arrival_date=$5, 
 				available_first_slot=$6, available_economy_slot=$7, status=$8 WHERE id=$9`
 
-	_, err := m.Db.ExecContext(ctx, stmt, f.From, f.To, f.DepartureDate, f.ArrivalDate, f.AvailableFirstSlot, f.AvailableEconomySlot, f.Status, id)
+	_, err := m.Db.ExecContext(ctx, stmt, f.Name, f.From, f.To, f.DepartureDate, f.ArrivalDate, f.AvailableFirstSlot, f.AvailableEconomySlot, f.Status, id)
 	if err != nil {
 		return nil, err
 	}
@@ -67,11 +67,11 @@ func (m FlightRepository) GetFlight(ctx context.Context, id int64) (*Flight, err
 }
 
 func (m FlightRepository) GetFlightById(ctx context.Context, id int64) (*Flight, error) {
-	stmt := `SELECT name, from_location, to_location, departure_date, arrival_date, 
-				available_first_slot, available_economy_slot, status FROM flights WHERE id=$1`
+	stmt := `SELECT id, name, from_location, to_location, departure_date, arrival_date, available_first_slot, available_economy_slot, status FROM flights WHERE id=$1`
 
 	var f Flight
-	err := m.Db.QueryRowContext(ctx, stmt, id).Scan(&f.From, &f.To, &f.DepartureDate, &f.ArrivalDate, &f.AvailableFirstSlot, &f.AvailableEconomySlot, &f.Status)
+	err := m.Db.QueryRowContext(ctx, stmt, id).Scan(&f.Id, &f.Name, &f.From, &f.To, &f.DepartureDate, &f.ArrivalDate, &f.AvailableFirstSlot, &f.AvailableEconomySlot, &f.Status)
+
 	if err != nil {
 		if err == sql.ErrNoRows {
 			return nil, nil

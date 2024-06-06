@@ -25,9 +25,9 @@ type Ticket struct {
 	Name string `json:"name,omitempty"`
 }
 
-func (r *BookingModel) GetTicketClass(ctx context.Context, name string) (*Ticket, error) {
-	query := "SELECT id, name FROM ticket WHERE name = $1"
-	row := r.Db.QueryRowContext(ctx, query, name)
+func (r *BookingModel) GetTicketClass(ctx context.Context, id int64) (*Ticket, error) {
+	query := "SELECT id, name FROM ticket WHERE id = $1"
+	row := r.Db.QueryRowContext(ctx, query, id)
 	var ticket Ticket
 	err := row.Scan(&ticket.ID, &ticket.Name)
 	if err != nil {
@@ -41,9 +41,9 @@ func (r *BookingModel) GetTicketClass(ctx context.Context, name string) (*Ticket
 }
 
 func (r *BookingModel) CreateBooking(ctx context.Context, b *Booking) (*Booking, error) {
-	query := `INSERT INTO booking (code, user_id, flight_id, status, created_at, updated_at) 
-              VALUES ($1, $2, $3, $4, $5, $6) RETURNING id`
-	err := r.Db.QueryRowContext(ctx, query, b.Code, b.UserID, b.FlightID, b.Status, b.CreatedAt, b.UpdatedAt).Scan(&b.ID)
+	query := `INSERT INTO booking (code, user_id, flight_id, status,ticket_id, created_at, updated_at) 
+              VALUES ($1, $2, $3, $4, $5, $6,$7) RETURNING id`
+	err := r.Db.QueryRowContext(ctx, query, b.Code, b.UserID, b.FlightID, b.Status, b.TicketID, b.CreatedAt, b.UpdatedAt).Scan(&b.ID)
 	if err != nil {
 		return nil, err
 	}
